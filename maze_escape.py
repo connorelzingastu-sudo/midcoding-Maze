@@ -7,6 +7,7 @@ HEIGHT = 600
 TILE_SIZE = 40
 PLAYER_SIZE = 20
 PLAYER_SPEED = 5
+TIME_SECONDS = 20
 FPS = 60
 
 WALL_COLOR = (100, 100, 100)
@@ -103,20 +104,21 @@ def draw_win_message(screen):
         screen.blit(game_over_text, (WIDTH // 2 - 90, HEIGHT // 2 - 30))
         screen.blit(restart_text, (WIDTH // 2 - 140, HEIGHT // 2 + 10))
 
-def draw_hud(screen, has_key, level, message):
+def draw_hud(screen, has_key, level, message, t):
     font = pygame.font.SysFont(None, 30)
-    hud_text = font.render(f"Get the key! Find the Exit!   Key Collected: {has_key}  Level: {level}", True, WHITE)
+    hud_text = font.render(f"Get the key! Find the Exit!   Key: {has_key}  Level: {level}  Time: {t:.1f}", True, WHITE)
     screen.blit(hud_text, (10, 10))
 
     hud_text = font.render(message, True, WHITE)
     screen.blit(hud_text, (10, HEIGHT - 40))
 
 def reset_game(level):
-    global floor, walls, key, exit, player, has_key, game_state, message
+    global floor, walls, key, exit, player, has_key, game_state, message, timer
     floor, walls, key, exit, player = load_level(level_maps[level])
     has_key = False
     game_state = "playing"
     message = ""
+    timer = TIME_SECONDS
 
 # --- Game Initialization --- #
 pygame.init()
@@ -170,6 +172,7 @@ has_key = False
 game_state = "playing"
 number_of_levels = len(level_maps)
 message = ""
+timer = TIME_SECONDS
 
 # --- Game Main Loop --- #
 running = True
@@ -210,14 +213,19 @@ while running:
             key if not has_key else None,
             exit, player
         )
-        draw_hud(screen, has_key, level, message)
+        draw_hud(screen, has_key, level, message, timer)
     elif game_state == "win":
         screen.fill((0, 0, 0))
         draw_win_message(screen)
     pygame.display.flip()
 
-    # Advance Framee
+    # Advance Frame
     clock.tick(60)
+    timer -= 1/60
+
+    # Check timer, restart level
+    if timer <= 0.0:
+        reset_game(level)
 
 pygame.quit()
 sys.exit()
