@@ -90,6 +90,7 @@ def update_player(player, keys, walls):
         player.y += PLAYER_SPEED
 
     # Check for collision with walls
+    # Sends you back if you touch the wall.
     for wall in walls:
         if wall.colliderect(player):
             player.x = player_x
@@ -126,6 +127,9 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 # --- Level Maps --- #
+
+# Each letter is assigned to a differant component in a tile
+# so I can easily see the map layout. 
 level_maps = { 
     0 : [
         "WWWWWWWWWW",
@@ -186,16 +190,21 @@ while running:
                 reset_game(level)
 
     # Get inputs and update player position
+    # Based on which keys are pressed. 
     keys = pygame.key.get_pressed()
 
     if game_state == "playing":
         update_player(player, keys, walls)
 
         # Check for key
+        # When the key gets collected, it activates the door collision 
+        # this happens becuse of the has_key variable. 
         if not has_key and player.colliderect(key):
             has_key = True
 
         # Check win condition
+        # Check for having the key and colliding with the door
+        # and being on the last level. 
         if player.colliderect(exit):
             if has_key:
                 level += 1
